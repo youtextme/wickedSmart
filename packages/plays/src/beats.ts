@@ -37,6 +37,26 @@ const DAY_OPEN_CHOICES: BeatChoice[] = [
 const DAY_OPEN_REVEAL =
   'Sistine stops you: look up. The bird is carved in the gate, worn smooth by rain. That is where today starts.';
 
+function gateChoiceFields(): Omit<Beat, 'id' | 'playId' | 'index'> {
+  return {
+    kind: 'choice',
+    text: DAY_OPEN_PROMPT,
+    choices: DAY_OPEN_CHOICES,
+    correctChoiceId: 'bird',
+    revealText: DAY_OPEN_REVEAL,
+  };
+}
+
+/** Reusable 4-choice gate beat — used for day opener and empty-catalog fallback. */
+export function gateChoiceBeat(playId: string, index = 0): Beat {
+  return {
+    id: `${playId}-gate-choice`,
+    playId,
+    index,
+    ...gateChoiceFields(),
+  };
+}
+
 export function beatsForPlay(play: PlayView, opts?: { dayOpener?: boolean }): Beat[] {
   const beats: Beat[] = [];
   let n = 0;
@@ -46,13 +66,7 @@ export function beatsForPlay(play: PlayView, opts?: { dayOpener?: boolean }): Be
   };
 
   if (opts?.dayOpener && play.order === 0) {
-    add({
-      kind: 'choice',
-      text: DAY_OPEN_PROMPT,
-      choices: DAY_OPEN_CHOICES,
-      correctChoiceId: 'bird',
-      revealText: DAY_OPEN_REVEAL,
-    });
+    add(gateChoiceFields());
   }
 
   switch (play.kind) {
@@ -167,12 +181,7 @@ export function beatsForPlay(play: PlayView, opts?: { dayOpener?: boolean }): Be
   }
 
   if (beats.length === 0) {
-    const text = `${play.title}. ${play.doAction}`;
-    add({
-      kind: 'scene',
-      text,
-      tapWords: tapWordsInText(text),
-    });
+    add(gateChoiceFields());
   }
 
   return beats;

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { beatsForPlay, type Beat, type PlayView, type SessionState } from '@wickedsmark/plays';
+import { beatsForPlay, gateChoiceBeat, type PlayView, type SessionState } from '@wickedsmark/plays';
 import type { ShellPorts } from '../shell/wire';
 import { resumeAudio, startAmbient, stopAmbient } from './audio';
 import { BeatScreen } from './BeatScreen';
@@ -13,25 +13,6 @@ type Phase = SessionState['phase'] | 'loading';
 function firstOpenPlay(plays: PlayView[], done: Set<string>): PlayView | undefined {
   return plays.find((p) => !done.has(p.id));
 }
-
-function sceneBeat(play: { id: string; title: string; doAction: string }): Beat {
-  const text = `${play.title}. ${play.doAction}`;
-  return {
-    id: `${play.id}-fallback`,
-    playId: play.id,
-    index: 0,
-    kind: 'scene',
-    text,
-  };
-}
-
-const HARD_FALLBACK_BEAT: Beat = {
-  id: 'd0-r1-fallback',
-  playId: 'd0-r1',
-  index: 0,
-  kind: 'scene',
-  text: 'A story is waiting. Tap Next.',
-};
 
 export function KidPath({ clock, plays, proof }: ShellPorts) {
   const dayId = clock.queries.today();
@@ -53,9 +34,9 @@ export function KidPath({ clock, plays, proof }: ShellPorts) {
   const beats = useMemo(() => {
     if (!resolvedPlay) return [];
     const generated = beatsForPlay(resolvedPlay, { dayOpener });
-    return generated.length > 0 ? generated : [sceneBeat(resolvedPlay)];
+    return generated.length > 0 ? generated : [gateChoiceBeat(resolvedPlay.id)];
   }, [resolvedPlay, dayOpener]);
-  const beat = beats[beatIndex] ?? beats[0] ?? (resolvedPlay ? sceneBeat(resolvedPlay) : HARD_FALLBACK_BEAT);
+  const beat = beats[beatIndex] ?? beats[0];
 
   const save = useCallback(
     async (patch: Partial<SessionState> & { lastPlayId?: string | null }) => {
@@ -118,6 +99,12 @@ export function KidPath({ clock, plays, proof }: ShellPorts) {
       cancelled = true;
     };
   }, [dayId, plays]);
+
+  useEffect(() => {
+    if (phase === 'beat' && beats.length === 0) {
+      setPhase('title');
+    }
+  }, [phase, beats.length]);
 
   useEffect(() => {
     if (phase !== 'beat' && phase !== 'proof') return;
@@ -217,7 +204,7 @@ export function KidPath({ clock, plays, proof }: ShellPorts) {
       {phase === 'title' && (
         <GameTitle onGo={startFromTitle} muted={muted} onToggleMute={toggleMute} continuing={continuing} />
       )}
-      {phase === 'beat' && (
+      {phase === 'beat' && beat && (
         <BeatScreen
           beat={beat}
           draft={draft}

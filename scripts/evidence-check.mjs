@@ -88,7 +88,12 @@ ok('no "exercise" in kid UI');
 
 const kidPath = readFileSync(join(ROOT, 'apps/pwa/src/kid/KidPath.tsx'), 'utf8');
 if (!kidPath.includes('playsForDay')) fail('KidPath must sync-bind catalog via playsForDay');
-ok('KidPath sync catalog binding');
+if (kidPath.includes('HARD_FALLBACK') || kidPath.includes('sceneBeat')) {
+  fail('KidPath must not use scene/Tap-Next fallback beats');
+}
+if (/\bTap Next\b/i.test(kidPath)) fail('KidPath must not show Tap Next wall');
+if (!kidPath.includes('gateChoiceBeat')) fail('KidPath must fall back to gateChoiceBeat');
+ok('KidPath sync catalog binding; no Tap Next fallback');
 
 const kidCss = readFileSync(join(ROOT, 'apps/pwa/src/index.css'), 'utf8');
 for (const cls of ['title-glow', 'choice-glow', 'proof-burst']) {
