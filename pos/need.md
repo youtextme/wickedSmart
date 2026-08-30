@@ -1,6 +1,6 @@
 # Need — wickedSmart PWA (program card)
 
-**Status:** slice-1 in progress  
+**Status:** slice-1 **proven** (evidence-check exit 0, live URL)  
 **Surface:** 30-min practice / parent OS — not Cognitive Mirror  
 **Proven stamp this week:** `apps/pwa` + `packages/plays` + `packages/proof` only
 

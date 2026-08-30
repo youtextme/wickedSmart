@@ -17,7 +17,7 @@ export default function App() {
     <div className="app">
       {createElement('pwa-install', {
         'manual-apple': 'true',
-        'manifest-url': '/manifest.webmanifest',
+        'manifest-url': '/wickedSmart/manifest.webmanifest',
       })}
       {screen === 'list' && (
         <PlaysScreen
