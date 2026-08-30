@@ -94,7 +94,7 @@ export function health(): { ok: boolean } {
 
 export type { PlayCompleted, PlayView, PlaysPorts, SessionState } from './types';
 export { beatsForPlay, beatCount } from './beats';
-export type { Beat, BeatKind } from './beats';
+export type { Beat, BeatChoice, BeatKind } from './beats';
 export { glossary, lookupWord, tapWordsInText } from './glossary';
 export type { WordCard } from './glossary';
 export { QuestMap } from './ui/QuestMap';

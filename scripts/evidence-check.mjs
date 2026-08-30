@@ -103,6 +103,15 @@ if (!existsSync(faviconIco) || readFileSync(faviconIco).length < 200) {
 }
 ok('favicon.ico present');
 
+const beatsSrc = readFileSync(join(ROOT, 'packages/plays/src/beats.ts'), 'utf8');
+if (!beatsSrc.includes("kind: 'choice'") || !beatsSrc.includes('correctChoiceId')) {
+  fail('day opener must be a 4-choice beat');
+}
+const choicesBlock = beatsSrc.match(/const DAY_OPEN_CHOICES[\s\S]*?\];/)?.[0] ?? '';
+const dayChoiceCount = (choicesBlock.match(/label:/g) ?? []).length;
+if (dayChoiceCount !== 4) fail('day opener needs 4 choices');
+ok('day opener is 4-choice beat');
+
 const catalogSrc = readFileSync(join(ROOT, 'packages/plays/src/catalog.ts'), 'utf8');
 if (!catalogSrc.includes('Gate Scanner')) fail('catalog missing Gate Scanner (day 0 room 1)');
 ok('day-0 catalog has Gate Scanner');

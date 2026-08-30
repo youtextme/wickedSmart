@@ -1,7 +1,12 @@
 import { tapWordsInText } from './glossary';
 import type { PlayView } from './types';
 
-export type BeatKind = 'intro' | 'scene' | 'read' | 'prompt' | 'input' | 'link' | 'do';
+export type BeatKind = 'intro' | 'scene' | 'read' | 'prompt' | 'input' | 'link' | 'do' | 'choice';
+
+export interface BeatChoice {
+  id: string;
+  label: string;
+}
 
 export interface Beat {
   id: string;
@@ -14,10 +19,23 @@ export interface Beat {
   inputMinWords?: number;
   linkUrl?: string;
   linkLabel?: string;
+  choices?: BeatChoice[];
+  correctChoiceId?: string;
+  revealText?: string;
 }
 
-const DAY_OPEN =
-  'Something waits at the gate. Rob walks past every morning without looking up. Today feels different — like the air knows a secret.';
+const DAY_OPEN_PROMPT =
+  'Something waits at the gate. Rob walks past every morning without looking up. What do you notice first?';
+
+const DAY_OPEN_CHOICES: BeatChoice[] = [
+  { id: 'rust', label: 'The rust on the hinges' },
+  { id: 'bird', label: 'A bird carved in the wood' },
+  { id: 'number', label: 'The number painted twice' },
+  { id: 'truck', label: 'A truck on the highway' },
+];
+
+const DAY_OPEN_REVEAL =
+  'Sistine stops you: look up. The bird is carved in the gate, worn smooth by rain. That is where today starts.';
 
 export function beatsForPlay(play: PlayView, opts?: { dayOpener?: boolean }): Beat[] {
   const beats: Beat[] = [];
@@ -29,9 +47,11 @@ export function beatsForPlay(play: PlayView, opts?: { dayOpener?: boolean }): Be
 
   if (opts?.dayOpener && play.order === 0) {
     add({
-      kind: 'intro',
-      text: DAY_OPEN,
-      tapWords: tapWordsInText(DAY_OPEN),
+      kind: 'choice',
+      text: DAY_OPEN_PROMPT,
+      choices: DAY_OPEN_CHOICES,
+      correctChoiceId: 'bird',
+      revealText: DAY_OPEN_REVEAL,
     });
   }
 

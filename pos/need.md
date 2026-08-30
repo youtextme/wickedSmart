@@ -1,8 +1,34 @@
 # Need — wickedSmart PWA (program card)
 
-**Status:** slice-1 **proven** · slice-2 **in progress** · **reliability fix** (Go tap + favicon) **in review**
+**Status:** slice-1 **proven** · slice-2 **in progress** · **reliability + opener** on PR #4
 
 **Surface:** 30-min practice / parent OS — not Cognitive Mirror
+
+---
+
+## Opener fix — 4-choice first beat (2026-08-30)
+
+### Job
+
+After **Go**, first beat is **4 tap choices + voice** — not a paragraph with Tap Next. Wrong pick still advances: show + speak the right line, then **Next**.
+
+### Success
+
+| # | Check |
+|---|-------|
+| 1 | `beatsForPlay` day opener = `kind: 'choice'` with 4 options |
+| 2 | Pick speaks label; wrong pick reveals `revealText` (visible when muted) |
+| 3 | **Next** only after a pick |
+| 4 | `evidence-check` exit 0; no **exercise** in kid UI |
+| 5 | `favicon.ico` present; glow `pointer-events: none` |
+
+### Kill
+
+- Go → unexplained reading wall; Tap Next before any choice; **exercise** in kid UI.
+
+### Boundary
+
+- Day-0 opener only. Story paragraphs follow after choice beat.
 
 ---
 
@@ -17,7 +43,7 @@ Kid taps **Go** once → story beat appears. Tab icon is a readable gold **W**, 
 | # | Check |
 |---|-------|
 | 1 | `.title-glow` (and sibling glows) do not intercept pointer events |
-| 2 | Playwright: real `.go-btn` click → `.beat-screen` visible with story text |
+| 2 | Playwright: real `.go-btn` click → 4 `.beat-choice` buttons; Next after pick |
 | 3 | `favicon.ico` + PNG/SVG present in `apps/pwa/public/` |
 | 4 | `evidence-check` exit 0 |
 | 5 | GitHub Pages `/wickedSmart/` 200; `/wickedSmart/favicon.ico` 200 after merge |
@@ -28,7 +54,7 @@ Kid taps **Go** once → story beat appears. Tab icon is a readable gold **W**, 
 
 ### Boundary
 
-- CSS + static assets only. No catalog/story rewrite.
+- CSS + static assets + day-opener choice beat. No full catalog rewrite.
 
 ---
 
