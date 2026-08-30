@@ -9,6 +9,9 @@ registerSW({
   onRegisteredSW(_url, registration) {
     registration?.update();
   },
+  onNeedRefresh() {
+    /* do not reload under a GO tap */
+  },
 });
 
 createRoot(document.getElementById('root')!).render(

@@ -24,7 +24,7 @@ export default defineConfig({
         ],
       },
       workbox: {
-        cacheId: 'wickedsmart-game-v2',
+        cacheId: 'wickedsmart-game-v3',
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
         navigateFallback: '/wickedSmart/index.html',
         navigateFallbackDenylist: [/^\/wickedSmart\/assets\//],
