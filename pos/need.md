@@ -24,7 +24,7 @@ After **Go**, first beat is **4 tap choices + voice** — not a paragraph with T
 
 ### Kill
 
-- Go → unexplained reading wall; Tap Next before any choice; **exercise** in kid UI.
+- Go → unexplained reading wall; Tap Next before any choice; **HARD_FALLBACK** scene in KidPath; **exercise** in kid UI.
 
 ### Boundary
 
