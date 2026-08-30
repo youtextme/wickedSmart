@@ -48,7 +48,7 @@ export function QuestMap({ ports, dayId, onEnterPlay, onContinue }: Props) {
           </span>
         </div>
         <h1>{theme}</h1>
-        <p className="tease-map">{ports.queries.unlockTease()}</p>
+        <p className="map-sub">{plays.length} rooms today · ~15 min each</p>
       </header>
 
       {session?.lastRoute && session.lastRoute !== '/' && (
@@ -85,6 +85,7 @@ export function QuestMap({ ports, dayId, onEnterPlay, onContinue }: Props) {
           );
         })}
       </div>
+      <p className="tease-map">{ports.queries.unlockTease()}</p>
     </div>
   );
 }
