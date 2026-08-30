@@ -1,7 +1,34 @@
 # Need — wickedSmart PWA (program card)
 
-**Status:** slice-1 **proven** · slice-2 **in progress**  
+**Status:** slice-1 **proven** · slice-2 **in progress** · **reliability fix** (Go tap + favicon) **in review**
+
 **Surface:** 30-min practice / parent OS — not Cognitive Mirror
+
+---
+
+## Reliability fix — one-tap Go + real favicon (2026-08-30)
+
+### Job
+
+Kid taps **Go** once → story beat appears. Tab icon is a readable gold **W**, not a navy blob. `favicon.ico` ships with deploy.
+
+### Success
+
+| # | Check |
+|---|-------|
+| 1 | `.title-glow` (and sibling glows) do not intercept pointer events |
+| 2 | Playwright: real `.go-btn` click → `.beat-screen` visible with story text |
+| 3 | `favicon.ico` + PNG/SVG present in `apps/pwa/public/` |
+| 4 | `evidence-check` exit 0 |
+| 5 | GitHub Pages `/wickedSmart/` 200; `/wickedSmart/favicon.ico` 200 after merge |
+
+### Kill
+
+- New stack; **exercise** in kid UI; fake-ready without beat transition evidence.
+
+### Boundary
+
+- CSS + static assets only. No catalog/story rewrite.
 
 ---
 

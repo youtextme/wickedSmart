@@ -90,6 +90,19 @@ const kidPath = readFileSync(join(ROOT, 'apps/pwa/src/kid/KidPath.tsx'), 'utf8')
 if (!kidPath.includes('playsForDay')) fail('KidPath must sync-bind catalog via playsForDay');
 ok('KidPath sync catalog binding');
 
+const kidCss = readFileSync(join(ROOT, 'apps/pwa/src/index.css'), 'utf8');
+for (const cls of ['title-glow', 'choice-glow', 'proof-burst']) {
+  const re = new RegExp(`\\.${cls}\\s*\\{[^}]*pointer-events:\\s*none`, 's');
+  if (!re.test(kidCss)) fail(`${cls} must set pointer-events: none (decorative glow blocks taps)`);
+}
+ok('decorative glows do not intercept taps');
+
+const faviconIco = join(ROOT, 'apps/pwa/public/favicon.ico');
+if (!existsSync(faviconIco) || readFileSync(faviconIco).length < 200) {
+  fail('apps/pwa/public/favicon.ico missing or too small');
+}
+ok('favicon.ico present');
+
 const catalogSrc = readFileSync(join(ROOT, 'packages/plays/src/catalog.ts'), 'utf8');
 if (!catalogSrc.includes('Gate Scanner')) fail('catalog missing Gate Scanner (day 0 room 1)');
 ok('day-0 catalog has Gate Scanner');

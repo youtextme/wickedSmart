@@ -1,11 +1,19 @@
 {
   "name": "wickedsmark",
   "private": true,
-  "workspaces": ["packages/*", "apps/*"],
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
   "scripts": {
     "dev": "npm run dev -w @wickedsmark/pwa",
     "build": "npm run build -w @wickedsmark/pwa",
     "preview": "npm run preview -w @wickedsmark/pwa",
-    "evidence-check": "node scripts/evidence-check.mjs"
+    "evidence-check": "node scripts/evidence-check.mjs",
+    "test:go": "node scripts/test-go.mjs",
+    "icons": "node scripts/generate-icons.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.50.0"
   }
 }
