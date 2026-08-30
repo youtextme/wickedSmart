@@ -8,7 +8,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'icon-192.png'],
+      includeAssets: ['favicon.svg', 'favicon.ico', 'icon-192.png'],
       manifest: {
         name: 'wickedSmart',
         short_name: 'wickedSmart',
@@ -24,7 +24,7 @@ export default defineConfig({
         ],
       },
       workbox: {
-        cacheId: 'wickedsmart-game-v1',
+        cacheId: 'wickedsmart-game-v2',
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
         navigateFallback: '/wickedSmart/index.html',
         navigateFallbackDenylist: [/^\/wickedSmart\/assets\//],
