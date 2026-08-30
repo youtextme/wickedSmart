@@ -133,7 +133,8 @@ export function KidPath({ clock, plays, proof }: ShellPorts) {
   }
 
   function startFromTitle() {
-    const next = firstOpenPlay(dayPlays, doneSet) ?? dayPlays[0] ?? plays.queries.getPlay('d0-r1');
+    const pool = dayPlays.length > 0 ? dayPlays : plays.queries.playsForDay('2026-08-30');
+    const next = firstOpenPlay(pool, doneSet) ?? pool[0] ?? plays.queries.getPlay('d0-r1');
     const id = next?.id ?? 'd0-r1';
     setPlayId(id);
     setBeatIndex(0);
@@ -143,7 +144,7 @@ export function KidPath({ clock, plays, proof }: ShellPorts) {
   }
 
   async function handleNext() {
-    if (!beat) return;
+    if (!beat) { setPhase('proof'); void save({ phase: 'proof' }); return; }
     const id = resolvedPlay?.id ?? playId;
     if (id) await plays.commands.saveDraft(dayId, id, `beat-${beatIndex}`, draft);
 
