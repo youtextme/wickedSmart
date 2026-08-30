@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { beatsForPlay, type Beat, type PlayView, type SessionState } from '@wickedsmark/plays';
 import type { ShellPorts } from '../shell/wire';
 import { startAmbient, stopAmbient } from './audio';
@@ -73,43 +73,59 @@ export function KidPath({ clock, plays, proof }: ShellPorts) {
     [plays, dayId, playId, beatIndex, phase, secondsToday],
   );
 
+  const goLock = useRef(false);
+
   useEffect(() => {
+    const forced = sessionStorage.getItem('ws-go-play');
+    if (forced) {
+      goLock.current = true;
+      setPlayId(forced);
+      setBeatIndex(0);
+      setPhase('beat');
+    }
+    let cancelled = false;
     void (async () => {
       const done = await plays.queries.completedIds(dayId);
+      if (cancelled) return;
       setCompletedIds(done);
       const s = await plays.queries.getSession(dayId);
+      if (cancelled || goLock.current) return;
       if (s?.secondsToday) setSecondsToday(s.secondsToday);
 
       const inProgress = s?.lastPlayId && !done.includes(s.lastPlayId);
 
       if (s?.onBreak || s?.phase === 'break') {
         setContinuing(done.length > 0 || !!inProgress);
-        setPhase('title');
+        setPhase((p) => (p === 'loading' ? 'title' : p));
         return;
       }
       if (s?.phase === 'proof' && s.lastPlayId) {
         setPlayId(s.lastPlayId);
         setBeatIndex(s.beatIndex ?? 0);
-        setPhase('proof');
+        setPhase((p) => (p === 'loading' ? 'proof' : p));
         return;
       }
       if (s?.phase === 'choice' && s.lastPlayId) {
         setPlayId(s.lastPlayId);
-        setPhase('choice');
+        setPhase((p) => (p === 'loading' ? 'choice' : p));
         return;
       }
       if (s?.phase === 'beat' && s.lastPlayId) {
         setPlayId(s.lastPlayId);
         setBeatIndex(s.beatIndex ?? 0);
         const d = await plays.queries.getDraft(dayId, s.lastPlayId, `beat-${s.beatIndex ?? 0}`);
+        if (cancelled || goLock.current) return;
         setDraft(d);
-        setPhase('beat');
+        setPhase((p) => (p === 'loading' ? 'beat' : p));
         setContinuing(done.length > 0);
         return;
       }
       setContinuing(done.length > 0);
-      setPhase('title');
+      setPhase((p) => (p === 'loading' ? 'title' : p));
     })();
+    return () => {
+      cancelled = true;
+    };
   }, [dayId, plays]);
 
   useEffect(() => {
@@ -136,6 +152,12 @@ export function KidPath({ clock, plays, proof }: ShellPorts) {
     const pool = dayPlays.length > 0 ? dayPlays : plays.queries.playsForDay('2026-08-30');
     const next = firstOpenPlay(pool, doneSet) ?? pool[0] ?? plays.queries.getPlay('d0-r1');
     const id = next?.id ?? 'd0-r1';
+    goLock.current = true;
+    try {
+      sessionStorage.setItem('ws-go-play', id);
+    } catch {
+      /* private mode */
+    }
     setPlayId(id);
     setBeatIndex(0);
     setDraft('');
