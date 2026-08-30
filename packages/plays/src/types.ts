@@ -44,6 +44,11 @@ export interface SessionState {
   lastRoute: string;
   lastPlayId: string | null;
   lastStep: number;
+  phase: 'title' | 'beat' | 'proof' | 'choice' | 'break';
+  beatIndex: number;
+  onBreak: boolean;
+  secondsToday: number;
+  lastTickAt: string | null;
 }
 
 export interface PlaysPorts {

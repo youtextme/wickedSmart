@@ -1,1 +1,1 @@
-{"root":["./src/App.tsx","./src/main.tsx","./src/vite-env.d.ts","./src/shell/wire.ts"],"version":"6.0.3"}
+{"root":["./src/App.tsx","./src/main.tsx","./src/vite-env.d.ts","./src/kid/BeatScreen.tsx","./src/kid/GameProof.tsx","./src/kid/GameTitle.tsx","./src/kid/KidPath.tsx","./src/kid/ParentCorner.tsx","./src/kid/PlayChoice.tsx","./src/kid/TapText.tsx","./src/kid/audio.ts","./src/kid/growth.ts","./src/shell/wire.ts"],"version":"6.0.3"}

@@ -45,6 +45,11 @@ export function PlayRunner({ ports, dayId, play, step, onStepChange, onComplete,
       lastRoute: `/play/${play.id}/step/${step}`,
       lastPlayId: play.id,
       lastStep: step,
+      phase: 'beat',
+      beatIndex: step,
+      onBreak: false,
+      secondsToday: 0,
+      lastTickAt: null,
     });
   }, [ports, dayId, play.id, step]);
 

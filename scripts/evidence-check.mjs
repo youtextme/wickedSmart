@@ -86,9 +86,9 @@ for (const pkg of ['packages/plays/src/ui', 'packages/proof/src/ui', 'apps/pwa/s
 }
 ok('no "exercise" in kid UI');
 
-const questMap = readFileSync(join(ROOT, 'packages/plays/src/ui/QuestMap.tsx'), 'utf8');
-if (!questMap.includes('playsForDay')) fail('QuestMap must sync-bind catalog via playsForDay');
-ok('QuestMap sync catalog binding');
+const kidPath = readFileSync(join(ROOT, 'apps/pwa/src/kid/KidPath.tsx'), 'utf8');
+if (!kidPath.includes('playsForDay')) fail('KidPath must sync-bind catalog via playsForDay');
+ok('KidPath sync catalog binding');
 
 const catalogSrc = readFileSync(join(ROOT, 'packages/plays/src/catalog.ts'), 'utf8');
 if (!catalogSrc.includes('Gate Scanner')) fail('catalog missing Gate Scanner (day 0 room 1)');

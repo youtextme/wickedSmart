@@ -1,4 +1,5 @@
 import Dexie, { type Table } from 'dexie';
+import type { SessionState } from './types';
 
 export interface CompletionRow {
   key: string;
@@ -12,6 +13,11 @@ export interface SessionRow {
   lastRoute: string;
   lastPlayId: string | null;
   lastStep: number;
+  phase?: SessionState['phase'];
+  beatIndex?: number;
+  onBreak?: boolean;
+  secondsToday?: number;
+  lastTickAt?: string | null;
   updatedAt: string;
 }
 
@@ -67,13 +73,17 @@ export async function getCompletionsForDay(dayId: string): Promise<string[]> {
   return rows.map((r) => r.playId);
 }
 
-export async function saveSession(
-  dayId: string,
-  data: { lastRoute: string; lastPlayId: string | null; lastStep: number },
-): Promise<void> {
+export async function saveSession(dayId: string, data: SessionState): Promise<void> {
   await db.sessions.put({
     dayId,
-    ...data,
+    lastRoute: data.lastRoute,
+    lastPlayId: data.lastPlayId,
+    lastStep: data.lastStep,
+    phase: data.phase,
+    beatIndex: data.beatIndex,
+    onBreak: data.onBreak,
+    secondsToday: data.secondsToday,
+    lastTickAt: data.lastTickAt,
     updatedAt: new Date().toISOString(),
   });
 }

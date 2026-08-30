@@ -12,7 +12,7 @@ export default defineConfig({
       manifest: {
         name: 'wickedSmart',
         short_name: 'wickedSmart',
-        description: 'Quest map — short plays, proof you showed up.',
+        description: 'A story game — short plays, proof you showed up.',
         theme_color: '#1e3a5f',
         background_color: '#f6f4ef',
         display: 'standalone',
@@ -24,7 +24,7 @@ export default defineConfig({
         ],
       },
       workbox: {
-        cacheId: 'wickedsmart-map-v3',
+        cacheId: 'wickedsmart-game-v1',
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
         navigateFallback: '/wickedSmart/index.html',
         navigateFallbackDenylist: [/^\/wickedSmart\/assets\//],

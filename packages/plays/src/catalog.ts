@@ -1,6 +1,6 @@
 import type { Play, PlayEngine } from './types';
 
-const MINS = 15;
+const MINS = 10;
 
 function read(id: string, day: number, order: number, title: string, room: string, skill: string, paragraphs: string[]): Play {
   return {

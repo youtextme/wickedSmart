@@ -56,6 +56,11 @@ export function createPlays(): PlaysPorts {
           lastRoute: s.lastRoute,
           lastPlayId: s.lastPlayId,
           lastStep: s.lastStep,
+          phase: s.phase ?? 'title',
+          beatIndex: s.beatIndex ?? 0,
+          onBreak: s.onBreak ?? false,
+          secondsToday: s.secondsToday ?? 0,
+          lastTickAt: s.lastTickAt ?? null,
         };
       },
       getDraft,
@@ -88,5 +93,9 @@ export function health(): { ok: boolean } {
 }
 
 export type { PlayCompleted, PlayView, PlaysPorts, SessionState } from './types';
+export { beatsForPlay, beatCount } from './beats';
+export type { Beat, BeatKind } from './beats';
+export { glossary, lookupWord, tapWordsInText } from './glossary';
+export type { WordCard } from './glossary';
 export { QuestMap } from './ui/QuestMap';
 export { PlayRunner } from './ui/PlayRunner';
