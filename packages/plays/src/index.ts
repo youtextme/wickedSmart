@@ -43,6 +43,7 @@ export function createPlays(): PlaysPorts {
     },
     queries: {
       forDay: async (dayId) => getPlaysForDay(dayIndexFor(dayId)).map(toView),
+      playsForDay: (dayId) => getPlaysForDay(dayIndexFor(dayId)).map(toView),
       getPlay: (playId) => {
         const p = getPlay(playId);
         return p ? toView(p) : undefined;

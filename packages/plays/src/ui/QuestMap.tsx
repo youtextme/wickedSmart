@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { engineLabel } from '../catalog';
 import type { PlayView, PlaysPorts } from '../types';
 
@@ -9,29 +9,45 @@ interface Props {
   onContinue: (route: string) => void;
 }
 
+function starterRoomIds(plays: PlayView[]): Set<string> {
+  return new Set(plays.filter((p) => p.order === 0).map((p) => p.id));
+}
+
 export function QuestMap({ ports, dayId, onEnterPlay, onContinue }: Props) {
-  const [plays, setPlays] = useState<PlayView[]>([]);
-  const [done, setDone] = useState<Set<string>>(new Set());
-  const [unlocked, setUnlocked] = useState<Set<string>>(new Set());
+  const plays = useMemo(() => ports.queries.playsForDay(dayId), [ports, dayId]);
+  const [done, setDone] = useState<Set<string>>(() => new Set());
+  const [unlocked, setUnlocked] = useState<Set<string>>(() => starterRoomIds(plays));
   const [session, setSession] = useState<{ lastRoute: string; lastPlayId: string | null } | null>(null);
 
-  const load = useCallback(async () => {
-    const list = await ports.queries.forDay(dayId);
-    setPlays(list);
-    const completed = new Set(await ports.queries.completedIds(dayId));
-    setDone(completed);
-    const open = new Set<string>();
-    for (const p of list) {
-      if (await ports.queries.isRoomUnlocked(dayId, p.id)) open.add(p.id);
+  const loadProgress = useCallback(async () => {
+    const base = starterRoomIds(plays);
+    setUnlocked(new Set(base));
+
+    try {
+      const completed = new Set(await ports.queries.completedIds(dayId));
+      setDone(completed);
+
+      const open = new Set(base);
+      for (const p of plays) {
+        if (open.has(p.id)) continue;
+        if (await ports.queries.isRoomUnlocked(dayId, p.id)) open.add(p.id);
+      }
+      setUnlocked(open);
+    } catch {
+      setUnlocked(base);
     }
-    setUnlocked(open);
-    const s = await ports.queries.getSession(dayId);
-    setSession(s);
-  }, [ports, dayId]);
+
+    try {
+      const s = await ports.queries.getSession(dayId);
+      setSession(s);
+    } catch {
+      setSession(null);
+    }
+  }, [ports, dayId, plays]);
 
   useEffect(() => {
-    void load();
-  }, [load]);
+    void loadProgress();
+  }, [loadProgress]);
 
   const theme = ports.queries.dayTheme(dayId);
   const gradient = ports.queries.dayGradient(dayId);
@@ -48,7 +64,7 @@ export function QuestMap({ ports, dayId, onEnterPlay, onContinue }: Props) {
           </span>
         </div>
         <h1>{theme}</h1>
-        <p className="map-sub">{plays.length} rooms today · ~15 min each</p>
+        <p className="map-sub">{total} rooms today · ~15 min each</p>
       </header>
 
       {session?.lastRoute && session.lastRoute !== '/' && (
@@ -64,7 +80,7 @@ export function QuestMap({ ports, dayId, onEnterPlay, onContinue }: Props) {
       <div className="map-path">
         {plays.map((play, i) => {
           const isDone = done.has(play.id);
-          const isOpen = unlocked.has(play.id);
+          const isOpen = play.order === 0 || unlocked.has(play.id);
           const isNext = isOpen && !isDone;
           return (
             <button

@@ -54,6 +54,8 @@ export interface PlaysPorts {
   };
   queries: {
     forDay(dayId: string): Promise<PlayView[]>;
+    /** Sync catalog lookup — binds clock dayId → week index → plays (no Dexie). */
+    playsForDay(dayId: string): PlayView[];
     getPlay(playId: string): PlayView | undefined;
     isComplete(dayId: string, playId: string): Promise<boolean>;
     getSession(dayId: string): Promise<SessionState | null>;
