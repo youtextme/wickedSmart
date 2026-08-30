@@ -1,48 +1,52 @@
-# Need — POS adoption for Powerful Kids (this change)
+# Need — wickedSmart PWA (program card)
 
-**Status:** proven (pending `npm run build` exit 0)
+**Status:** slice-1 in progress  
+**Surface:** 30-min practice / parent OS — not Cognitive Mirror  
+**Proven stamp this week:** `apps/pwa` + `packages/plays` + `packages/proof` only
+
+## Job
+
+Ayaan opens a PWA this week, finishes **one real play**, leaves a **proof artifact**, can close the tab. Parent does not babysit the stack.
 
 ## Success
 
-- A new contributor or agent opening the repo sees POS v3.6 as default law (`AGENTS.md`, `.cursor/rules/00-prompt-os.mdc`).
-- Builder learnings live in git (`docs/LEARNINGS.md`, `docs/30-MINUTE-PRACTICE.md`), not only on an agent box.
-- `npm run build` still passes (L2 programmatic verification).
-- README links POS, learnings, and the two product surfaces (Mirror vs 30-min practice).
+- Cold HTTPS URL → installable PWA (Add to Home Screen).
+- Kid path: **offline, no login**, local write is source of truth.
+- One play completed; proof written to proof contract (IndexedDB outbox).
+- `npm run evidence-check` exit 0 on play+proof slice.
+- Repeat open → plays visible in <1s (V1 SLO).
 
 ## Kill
 
-- POS docs or wiring turn the kid Vite app into a habit tracker, task manager, or chore UI.
-- POS adoption adds kid-facing UI effort for governance (docs/rules only).
+- Perceived effort after open; lecture/task UI.
+- **Login wall on first open** (anonymous kid is the happy path).
+- Shell contains domain logic.
+- Any capability imports another's **internals** or reads sibling IndexedDB.
+- Proven = button count or folder count (not receipts).
+- Kid waits on Google Drive to complete a play.
+- Word **exercise** in kid or parent UI.
+- Claiming "microservices" without contract + isolated failure + replaceable impl.
 
 ## Boundary
 
-- Do not vendor the full POS kernel; point to upstream.
-- Do not clone `prompt-operating-system` unless a specific file must be read over the network.
-- No PR; commit on `main`.
+- This week: **one Origin static HTTPS deploy**, one PWA bundle.
+- Growth: extract packages without rewrite; **no HTTP extraction this week**.
+- Diary / drive / clock-as-service / identity = **later slices** — may exist as contracts, not proven stamp.
+- POS is **build-time**, not runtime kid UI.
 
-## Definition of done (checkable)
+## Done (checkable)
 
-| # | Check | Evidence |
-|---|-------|----------|
-| 1 | `AGENTS.md` exists with seven-layer runner + eight tenets + verification ladder | file on disk |
-| 2 | `.cursor/rules/00-prompt-os.mdc` exists with `alwaysApply: true` | file on disk |
-| 3 | `docs/LEARNINGS.md` committed | file on disk |
-| 4 | `docs/30-MINUTE-PRACTICE.md` committed | file on disk |
-| 5 | README links POS, learnings, surfaces, Origin/wickedSmart | diff in README |
-| 6 | Kid app unchanged in behavior (no habit-tracker UI) | no `src/` mission/streak UI changes |
-| 7 | Build green | `npm run build` exit 0 |
+| # | Check | Receipt |
+|---|-------|---------|
+| 1 | Three program cards frozen | `pos/need.md`, `pos/context.md`, `pos/hypothesis.md` |
+| 2 | Kid completes 1 play | plays completion boolean persisted |
+| 3 | Proof artifact written | proof outbox entry `{dayId, playId, proofId}` |
+| 4 | Contract tests pass | `scripts/evidence-check.mjs` exit 0 |
+| 5 | Build green | `npm run build` exit 0 |
+| 6 | Live URL | HTTPS deploy receipt |
 
-## Hypothesis
+## Reliability law (kid path wins)
 
-**H:** Repo-level POS law (docs + Cursor rule) is enough for agents to run the seven-layer runner without vendoring the kernel.
-
-**Cheapest disproof:** Next agent ships product code without freezing Need or without L2 build verification.
-
-**Observation:** This change itself follows the runner; build exit code is the receipt.
-
-## Context inventory
-
-- Source of truth: [prompt-operating-system](https://github.com/youtextme/prompt-operating-system) v3.6
-- Live docs: [youtextme.github.io/prompt-operating-system](https://youtextme.github.io/prompt-operating-system/)
-- Existing kid app: `src/` Vite + React companion (missions, feedback, parent export)
-- Product surfaces: Mirror (kid app) vs 30-min practice (separate; see `docs/30-MINUTE-PRACTICE.md`)
+- Local truth beats Drive. Drive is replica behind proof outbox (later).
+- Day id = only time concept: `today = calendar date of (instant − 3h) in Asia/Seoul`.
+- No shared `store.ts`. One store per package.

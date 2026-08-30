@@ -1,0 +1,1 @@
+{ "name": "@wickedsmark/diary", "version": "0.0.0-stub", "private": true, "type": "module", "exports": { ".": "./src/index.ts" } }
