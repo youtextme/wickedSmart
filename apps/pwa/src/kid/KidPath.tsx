@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { beatsForPlay, type PlayView, type SessionState } from '@wickedsmark/plays';
+import { beatsForPlay, type Beat, type PlayView, type SessionState } from '@wickedsmark/plays';
 import type { ShellPorts } from '../shell/wire';
 import { startAmbient, stopAmbient } from './audio';
 import { BeatScreen } from './BeatScreen';
@@ -13,6 +13,25 @@ type Phase = SessionState['phase'] | 'loading';
 function firstOpenPlay(plays: PlayView[], done: Set<string>): PlayView | undefined {
   return plays.find((p) => !done.has(p.id));
 }
+
+function sceneBeat(play: { id: string; title: string; doAction: string }): Beat {
+  const text = `${play.title}. ${play.doAction}`;
+  return {
+    id: `${play.id}-fallback`,
+    playId: play.id,
+    index: 0,
+    kind: 'scene',
+    text,
+  };
+}
+
+const HARD_FALLBACK_BEAT: Beat = {
+  id: 'd0-r1-fallback',
+  playId: 'd0-r1',
+  index: 0,
+  kind: 'scene',
+  text: 'A story is waiting. Tap Next.',
+};
 
 export function KidPath({ clock, plays, proof }: ShellPorts) {
   const dayId = clock.queries.today();
@@ -28,13 +47,15 @@ export function KidPath({ clock, plays, proof }: ShellPorts) {
   const [continuing, setContinuing] = useState(false);
 
   const play = playId ? plays.queries.getPlay(playId) : undefined;
+  const resolvedPlay = play ?? (phase === 'beat' ? plays.queries.getPlay('d0-r1') : undefined);
   const doneSet = useMemo(() => new Set(completedIds), [completedIds]);
-  const dayOpener = play?.order === 0 && playId !== null && !doneSet.has(playId);
-  const beats = useMemo(
-    () => (play ? beatsForPlay(play, { dayOpener }) : []),
-    [play, dayOpener],
-  );
-  const beat = beats[beatIndex];
+  const dayOpener = resolvedPlay?.order === 0 && resolvedPlay != null && !doneSet.has(resolvedPlay.id);
+  const beats = useMemo(() => {
+    if (!resolvedPlay) return [];
+    const generated = beatsForPlay(resolvedPlay, { dayOpener });
+    return generated.length > 0 ? generated : [sceneBeat(resolvedPlay)];
+  }, [resolvedPlay, dayOpener]);
+  const beat = beats[beatIndex] ?? beats[0] ?? (resolvedPlay ? sceneBeat(resolvedPlay) : HARD_FALLBACK_BEAT);
 
   const save = useCallback(
     async (patch: Partial<SessionState> & { lastPlayId?: string | null }) => {
@@ -112,27 +133,27 @@ export function KidPath({ clock, plays, proof }: ShellPorts) {
   }
 
   function startFromTitle() {
-    const next = firstOpenPlay(dayPlays, doneSet);
-    if (!next) {
-      setPhase('title');
-      return;
-    }
-    setPlayId(next.id);
+    const next = firstOpenPlay(dayPlays, doneSet) ?? dayPlays[0] ?? plays.queries.getPlay('d0-r1');
+    const id = next?.id ?? 'd0-r1';
+    setPlayId(id);
     setBeatIndex(0);
     setDraft('');
     setPhase('beat');
-    void save({ phase: 'beat', beatIndex: 0, lastPlayId: next.id, onBreak: false });
+    void save({ phase: 'beat', beatIndex: 0, lastPlayId: id, onBreak: false });
   }
 
   async function handleNext() {
-    if (!play || !beat) return;
-    await plays.commands.saveDraft(dayId, play.id, `beat-${beatIndex}`, draft);
+    if (!beat) return;
+    const id = resolvedPlay?.id ?? playId;
+    if (id) await plays.commands.saveDraft(dayId, id, `beat-${beatIndex}`, draft);
 
     if (beatIndex < beats.length - 1) {
       const n = beatIndex + 1;
       setBeatIndex(n);
-      const d = await plays.queries.getDraft(dayId, play.id, `beat-${n}`);
-      setDraft(d);
+      if (id) {
+        const d = await plays.queries.getDraft(dayId, id, `beat-${n}`);
+        setDraft(d);
+      }
       void save({ beatIndex: n, phase: 'beat' });
       return;
     }
@@ -171,6 +192,7 @@ export function KidPath({ clock, plays, proof }: ShellPorts) {
   }
 
   const hasMore = dayPlays.some((p) => !completedIds.includes(p.id));
+  const activePlayId = resolvedPlay?.id ?? playId;
 
   if (phase === 'loading') {
     return <div className="game-loading" aria-busy />;
@@ -186,13 +208,13 @@ export function KidPath({ clock, plays, proof }: ShellPorts) {
       {phase === 'title' && (
         <GameTitle onGo={startFromTitle} muted={muted} onToggleMute={toggleMute} continuing={continuing} />
       )}
-      {phase === 'beat' && beat && play && (
+      {phase === 'beat' && (
         <BeatScreen
           beat={beat}
           draft={draft}
           onDraftChange={(v) => {
             setDraft(v);
-            void plays.commands.saveDraft(dayId, play.id, `beat-${beatIndex}`, v);
+            if (activePlayId) void plays.commands.saveDraft(dayId, activePlayId, `beat-${beatIndex}`, v);
           }}
           onNext={() => void handleNext()}
           muted={muted}

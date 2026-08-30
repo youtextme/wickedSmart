@@ -1,47 +1,72 @@
 let ambientStop: (() => void) | null = null;
 let ctx: AudioContext | null = null;
 
-function getCtx(): AudioContext {
-  if (!ctx) ctx = new AudioContext();
-  return ctx;
+type AudioContextCtor = typeof AudioContext;
+
+function getCtx(): AudioContext | null {
+  if (ctx) return ctx;
+  try {
+    const g = globalThis as typeof globalThis & { webkitAudioContext?: AudioContextCtor };
+    const AC = (typeof AudioContext !== 'undefined' ? AudioContext : undefined) ?? g.webkitAudioContext;
+    if (!AC) return null;
+    ctx = new AC();
+    return ctx;
+  } catch {
+    return null;
+  }
 }
 
 export function startAmbient(muted: boolean): void {
-  stopAmbient();
-  if (muted) return;
-  const ac = getCtx();
-  const osc = ac.createOscillator();
-  const gain = ac.createGain();
-  const lfo = ac.createOscillator();
-  const lfoGain = ac.createGain();
-  osc.type = 'sine';
-  osc.frequency.value = 146.83;
-  lfo.frequency.value = 0.08;
-  lfoGain.gain.value = 8;
-  gain.gain.value = 0.028;
-  lfo.connect(lfoGain);
-  lfoGain.connect(osc.frequency);
-  osc.connect(gain);
-  gain.connect(ac.destination);
-  osc.start();
-  lfo.start();
-  ambientStop = () => {
-    try {
-      osc.stop();
-      lfo.stop();
-    } catch {
-      /* already stopped */
-    }
-    ambientStop = null;
-  };
+  try {
+    stopAmbient();
+    if (muted) return;
+    const ac = getCtx();
+    if (!ac) return;
+    const osc = ac.createOscillator();
+    const gain = ac.createGain();
+    const lfo = ac.createOscillator();
+    const lfoGain = ac.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = 146.83;
+    lfo.frequency.value = 0.08;
+    lfoGain.gain.value = 8;
+    gain.gain.value = 0.028;
+    lfo.connect(lfoGain);
+    lfoGain.connect(osc.frequency);
+    osc.connect(gain);
+    gain.connect(ac.destination);
+    osc.start();
+    lfo.start();
+    ambientStop = () => {
+      try {
+        osc.stop();
+        lfo.stop();
+      } catch {
+        /* already stopped */
+      }
+      ambientStop = null;
+    };
+  } catch {
+    /* never throw */
+  }
 }
 
 export function stopAmbient(): void {
-  ambientStop?.();
+  try {
+    ambientStop?.();
+  } catch {
+    ambientStop = null;
+  }
 }
 
 export function resumeAudio(): void {
-  void getCtx().resume();
+  try {
+    const ac = getCtx();
+    if (!ac) return;
+    void ac.resume();
+  } catch {
+    /* never throw */
+  }
 }
 
 let bestVoice: SpeechSynthesisVoice | null = null;

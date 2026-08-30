@@ -146,6 +146,15 @@ export function beatsForPlay(play: PlayView, opts?: { dayOpener?: boolean }): Be
       break;
   }
 
+  if (beats.length === 0) {
+    const text = `${play.title}. ${play.doAction}`;
+    add({
+      kind: 'scene',
+      text,
+      tapWords: tapWordsInText(text),
+    });
+  }
+
   return beats;
 }
 

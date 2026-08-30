@@ -62,8 +62,12 @@ export function GameTitle({ onGo, muted, onToggleMute, continuing }: Props) {
   }, []);
 
   function handleGo() {
-    resumeAudio();
-    if (!muted) startAmbient(muted);
+    try {
+      resumeAudio();
+      if (!muted) startAmbient(muted);
+    } catch {
+      /* AudioContext must never kill GO */
+    }
     onGo();
   }
 
